@@ -1,6 +1,10 @@
 const axios = require('axios');
 
-const INTERNAL_API_KEY = 'fjhwesof838234987fhbnsj_35156135ds41fsdf';
+const INTERNAL_API_KEY = process.env.PI_API_KEY;
+
+if (!INTERNAL_API_KEY) {
+  throw new Error('PI_API_KEY environment variable not set');
+}
 
 exports.unlock = async (adapterData) => {
   const { ip, pin } = adapterData;
