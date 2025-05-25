@@ -1,4 +1,5 @@
-console.log('>>> FILEN LASTER INN');
+const logger = require('../utils/logger');
+logger.debug('>>> accessGroupController loaded');
 const db = require('../config/db');
 
 exports.createGroup = async (req, res) => {

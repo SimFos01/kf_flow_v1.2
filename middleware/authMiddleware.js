@@ -28,7 +28,7 @@ function verifyToken(req, res, next) {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
-    console.log('[AUTH] Token verifisert:', decoded);
+    logger.info('[AUTH] Token verifisert for bruker', decoded.id);
     next();
   } catch (err) {
     console.warn('[AUTH] Ugyldig token:', err.message);

@@ -3,12 +3,13 @@ const { logAccess, hasAccessToLock } = require('../utils/accessControl');
 const raspberryAdapter = require('../adapters/raspberryAdapter');
 const aviorAdapter = require('../adapters/aviorAdapter');
 const jwt = require('jsonwebtoken');
+const logger = require('../utils/logger');
 
 exports.createLock = async (req, res) => {
     const { name, type, adapter_data } = req.body;
   
-    console.log('🧪 req.user:', req.user);
-    console.log('📦 Request body:', req.body);
+    logger.debug('createLock called by user', req.user?.id);
+    logger.debug('createLock body:', { name, type });
   
     if (!name || !type || !adapter_data) {
       return res.status(400).json({ error: 'name, type og adapter_data kreves' });
@@ -72,7 +73,7 @@ exports.getLockList = async (req, res) => {
       };
     });
 
-    console.log('🔐 getLockList →', locks.length, 'låser funnet for bruker', userId);
+    logger.info('🔐 getLockList →', locks.length, 'låser funnet for bruker', userId);
     res.json(locks);
   } catch (err) {
     console.error('🔥 Feil i getLockList:', err.message);
@@ -215,14 +216,14 @@ exports.getAccessibleLocks = async (req, res) => {
             `SELECT * FROM locks WHERE owner_id = ?`,
             [req.user.id]
           );
-          console.log('[BODY]', req.body);
+          logger.debug('[BODY keys]', Object.keys(req.body || {}));
           if (!Array.isArray(rows)) {
             rows = [rows]; // Tving inn i array om det er et enkelt objekt
           }
           
           const locks = JSON.parse(JSON.stringify(rows)); // Sikrer ren array
-        
-            console.log('🔎 Hentet locks:', Array.isArray(locks), locks);
+
+            logger.debug('🔎 Hentet locks:', Array.isArray(locks), locks.length);
       const locksWithStatus = await Promise.all(
         locks.map(async (lock) => {
             let adapterData = lock.adapter_data;

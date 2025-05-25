@@ -6,6 +6,7 @@ require('dotenv').config();
 const expressOasGenerator = require('express-oas-generator'); // 👈 NYTT
 const express = require('express');
 const app = express();
+const logger = require('./utils/logger');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
@@ -27,7 +28,7 @@ app.use((req, res, next) => {
     req.socket?.remoteAddress ||
     (req.connection.socket ? req.connection.socket.remoteAddress : null);
 
-  console.log(`[INNKOMMENDE] IP: ${ip} - ${req.method} ${req.originalUrl}`);
+  logger.info(`[INNKOMMENDE] IP: ${ip} - ${req.method} ${req.originalUrl}`);
   next();
 });
 app.use(morgan('dev'));
@@ -45,7 +46,7 @@ fs.readdirSync(routesPath).forEach(file => {
     const route = require(path.join(routesPath, file));
     const routeName = '/' + file.replace('Routes.js', '').toLowerCase();
     app.use(routeName, route);
-    console.log(`🧩 Laster rute: ${routeName} fra ${file}`);
+    logger.debug(`🧩 Laster rute: ${routeName} fra ${file}`);
   }
 }); 
 // Opprett databaseforbindelse
@@ -134,4 +135,4 @@ const swaggerSpec = swaggerJSDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Start server
-app.listen(3000, () => console.log('🔐 Enclo server kjører på http://localhost:3000'));
+app.listen(3000, () => logger.info('🔐 Enclo server kjører på http://localhost:3000'));
