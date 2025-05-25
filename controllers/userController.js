@@ -1,25 +1,26 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
+const logger = require('../utils/logger');
 
 exports.loginUser = async (req, res) => {
     const { email, password } = req.body;
     // Minimal logging of login attempts without sensitive data
-    console.log('[LOGIN] Attempt for email:', email);
+    logger.info('[LOGIN] Attempt for email:', email);
   
     try {
       const result = await db.query("SELECT * FROM users WHERE email = ?", [email.trim()]);
       const user = Array.isArray(result) ? result[0] : result;
   
       // Only log that a user record was retrieved
-      console.log('🔎 Bruker fra SELECT');
+      logger.debug('🔎 Bruker fra SELECT');
   
       if (!user) {
         return res.status(401).json({ error: 'Ugyldig e-post eller passord' });
       }
-      console.log('🔐 Sammenligner passord...');
+      logger.debug('🔐 Sammenligner passord...');
         const valid = await bcrypt.compare(password, user.password);
-        console.log('🔐 bcrypt valid:', valid);
+        logger.debug('🔐 bcrypt valid:', valid);
       if (!valid) {
         return res.status(401).json({ error: 'Ugyldig e-post eller passord' });
       }

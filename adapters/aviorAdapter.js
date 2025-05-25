@@ -1,5 +1,6 @@
 // adapters/aviorMobikeyAdapter.js
 const axios = require('axios');
+const logger = require('../utils/logger');
 
 const mobikeyUrl = (responseType, device, password) =>
   `http://www.mobikey.eu/cmd/${responseType}/${device}/pwd/${password}`;
@@ -15,7 +16,7 @@ exports.open = async (adapterData) => {
     const res = await axios.post(url, command, {
       headers: { 'Content-Type': 'text/plain' }
     });
-    console.log(`[MOBIKEY] OPEN: ${safeUrl} →`, res.data);
+    logger.debug(`[MOBIKEY] OPEN: ${safeUrl} →`, res.data);
     return res.data;
   } catch (err) {
     console.error('[MOBIKEY] Feil ved OPEN:', err.message);
@@ -34,7 +35,7 @@ exports.lock = async (adapterData) => {
     const res = await axios.post(url, command, {
       headers: { 'Content-Type': 'text/plain' }
     });
-    console.log(`[MOBIKEY] LOCK: ${safeUrl} →`, res.data);
+    logger.debug(`[MOBIKEY] LOCK: ${safeUrl} →`, res.data);
     return res.data;
   } catch (err) {
     console.error('[MOBIKEY] Feil ved LOCK:', err.message);

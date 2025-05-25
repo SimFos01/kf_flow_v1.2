@@ -1,4 +1,5 @@
 const axios = require('axios');
+const logger = require('../utils/logger');
 
 const INTERNAL_API_KEY = process.env.PI_API_KEY;
 
@@ -16,7 +17,7 @@ exports.unlock = async (adapterData) => {
     const res = await axios.post(`http://${ip}/open`, { pin }, {
       headers: { 'x-api-key': INTERNAL_API_KEY }
     });
-    console.log(`🔓 [UNLOCK] Respons fra Pi ${ip}:`, {
+    logger.debug(`🔓 [UNLOCK] Respons fra Pi ${ip}:`, {
       status: res.status,
       data: res.data
     });
@@ -44,7 +45,7 @@ exports.lock = async (adapterData) => {
     const res = await axios.post(`http://${ip}/lock`, { pin }, {
       headers: { 'x-api-key': INTERNAL_API_KEY }
     });
-    console.log(`🔒 [LOCK] Respons fra Pi ${ip}:`, {
+    logger.debug(`🔒 [LOCK] Respons fra Pi ${ip}:`, {
       status: res.status,
       data: res.data
     });
@@ -73,7 +74,7 @@ exports.status = async (adapterData) => {
       params: { pin },
       headers: { 'x-api-key': INTERNAL_API_KEY }
     });
-    console.log(`📊 [STATUS] Respons fra Pi ${ip}:`, {
+    logger.debug(`📊 [STATUS] Respons fra Pi ${ip}:`, {
       status: res.status,
       data: res.data
     });
