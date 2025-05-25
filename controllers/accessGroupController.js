@@ -1,7 +1,5 @@
-
 const logger = require('../utils/logger');
 logger.debug('>>> accessGroupController loaded');
-=======
 console.log('>>> FILEN LASTER INN');
 const jwt = require('jsonwebtoken');
 
