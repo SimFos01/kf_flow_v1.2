@@ -205,7 +205,7 @@ router.post('/getbyid', verifyToken, lockController.getLockById);
  *       200:
  *         description: Liste over låser
  */
-router.post('/all_accessible', lockController.getAllAccessibleLocks);
+router.post('/all_accessible', verifyToken, lockController.getAllAccessibleLocks);
 
 
 module.exports = router;

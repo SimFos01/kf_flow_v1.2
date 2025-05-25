@@ -82,20 +82,12 @@ exports.getLockList = async (req, res) => {
 };
 
 exports.getAllAccessibleLocks = async (req, res) => {
-  const { token } = req.body;
+  // User is populated by verifyToken middleware
+  const userId = req.user && req.user.id;
 
-  if (!token) {
-    return res.status(401).json({ error: 'Mangler token' });
+  if (!userId) {
+    return res.status(401).json({ error: 'Mangler brukerinformasjon' });
   }
-
-  let decoded;
-  try {
-    decoded = jwt.verify(token, process.env.JWT_SECRET);
-  } catch (err) {
-    return res.status(401).json({ error: 'Ugyldig token' });
-  }
-
-  const userId = decoded.id;
 
   try {
     const query = `
