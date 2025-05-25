@@ -1,4 +1,5 @@
 const mariadb = require('mariadb');
+const logger = require('../utils/logger');
 
 const pool = mariadb.createPool({
   host: process.env.DB_HOST,
@@ -8,7 +9,7 @@ const pool = mariadb.createPool({
   connectionLimit: 5,
 });
 
-console.log('[DB] config:', {
+logger.info('[DB] config:', {
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   database: process.env.DB_NAME,
