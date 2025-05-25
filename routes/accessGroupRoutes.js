@@ -36,7 +36,7 @@ logger.debug('requireAdmin:', typeof requireAdmin);
 router.post('/list', verifyToken, accessGroupController.getAccessGroupsForUser);
 /**
  * @swagger
- * /accessgroup/access-group/users:
+ * /accessgroup/users:
  *   post:
  *     summary: Hent brukere i en tilgangsgruppe
  *     tags:
