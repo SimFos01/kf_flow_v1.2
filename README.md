@@ -1,5 +1,6 @@
 # kf_flow
 
+
 Dette er en Node.js-basert server for prototyping av adgangssystemet *Keyfree Flow*.
 
 ## Installasjon
@@ -53,3 +54,15 @@ curl -H "Authorization: Bearer <TOKEN>" http://localhost:3000/me
 
 Swagger-dokumentasjon er tilgjengelig på `http://localhost:3000/api-docs` etter at serveren er startet.
 
+=======
+Denne applikasjonen bruker Node.js. Prosjektet inkluderer enkle enhetstester som kan kjøres med Node sitt innebygde test-rammeverk.
+
+## Kjøre tester
+
+Installer avhengigheter og kjør deretter:
+
+```bash
+npm test
+```
+
+Dette vil kjøre alle testfiler i `tests/`-mappen.
