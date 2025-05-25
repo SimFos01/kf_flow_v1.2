@@ -4,21 +4,20 @@ const db = require('../config/db');
 
 exports.loginUser = async (req, res) => {
     const { email, password } = req.body;
-    console.log('[LOGIN] Input e-post:', JSON.stringify(email));
-    console.log('[LOGIN] req.body:', req.body);
+    // Minimal logging of login attempts without sensitive data
+    console.log('[LOGIN] Attempt for email:', email);
   
     try {
       const result = await db.query("SELECT * FROM users WHERE email = ?", [email.trim()]);
       const user = Array.isArray(result) ? result[0] : result;
   
-      console.log('🔎 Bruker fra SELECT:', user);
+      // Only log that a user record was retrieved
+      console.log('🔎 Bruker fra SELECT');
   
       if (!user) {
         return res.status(401).json({ error: 'Ugyldig e-post eller passord' });
       }
       console.log('🔐 Sammenligner passord...');
-     console.log('🔐 Klartekst passord:', password);
-        console.log('🔐 Hash i DB:', user.password);
         const valid = await bcrypt.compare(password, user.password);
         console.log('🔐 bcrypt valid:', valid);
       if (!valid) {
