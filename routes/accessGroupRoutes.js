@@ -2,11 +2,12 @@ const express = require('express');
 const router = express.Router();
 const { verifyToken, requireAdmin } = require('../middleware/authMiddleware');
 const accessGroupController = require('../controllers/accessGroupController');
-console.log('TYPE OF requireAdmin:', typeof requireAdmin);
-console.log('controller:', accessGroupController);
-console.log('createGroup:', accessGroupController.createGroup);
-console.log('verifyToken:', typeof verifyToken);
-console.log('requireAdmin:', typeof requireAdmin);
+const logger = require('../utils/logger');
+logger.debug('TYPE OF requireAdmin:', typeof requireAdmin);
+logger.debug('controller:', accessGroupController);
+logger.debug('createGroup:', accessGroupController.createGroup);
+logger.debug('verifyToken:', typeof verifyToken);
+logger.debug('requireAdmin:', typeof requireAdmin);
 /**
  * @swagger
  * /accessGroup/list:
