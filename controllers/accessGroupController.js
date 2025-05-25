@@ -1,4 +1,5 @@
 console.log('>>> FILEN LASTER INN');
+const jwt = require('jsonwebtoken');
 const db = require('../config/db');
 
 exports.createGroup = async (req, res) => {
