@@ -349,8 +349,9 @@ exports.openLock = async (req, res) => {
         return res.status(400).json({ error: 'adapter_data mangler påkrevd info (ip eller pin)' });
       }
     } else if (lock.type === 'avior') {
-      if (!adapterData.device || !adapterData.password || !adapterData.out) {
-        console.error('❌ adapterData mangler device, password eller out:', adapterData);
+        if (!adapterData.device || !adapterData.password || !adapterData.out) {
+          const { password, ...rest } = adapterData || {};
+          console.error('❌ adapterData mangler device, password eller out:', { ...rest, password: password ? '***' : undefined });
         await logAccess(userId, id, 'open', false);
         return res.status(400).json({ error: 'adapter_data mangler påkrevd info (device, password eller out)' });
       }
@@ -439,8 +440,9 @@ exports.lockLock = async (req, res) => {
         return res.status(400).json({ error: 'adapter_data mangler påkrevd info (ip eller pin)' });
       }
     } else if (lock.type === 'avior') {
-      if (!adapterData.device || !adapterData.password || !adapterData.out) {
-        console.error('❌ adapterData mangler device, password eller out:', adapterData);
+        if (!adapterData.device || !adapterData.password || !adapterData.out) {
+          const { password, ...rest } = adapterData || {};
+          console.error('❌ adapterData mangler device, password eller out:', { ...rest, password: password ? '***' : undefined });
         await logAccess(userId, id, 'lock', false);
         return res.status(400).json({ error: 'adapter_data mangler påkrevd info (device, password eller out)' });
       }
