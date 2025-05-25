@@ -561,3 +561,66 @@ exports.getLastActivityForLock = async (req, res) => {
     res.status(500).json({ error: 'Kunne ikke hente siste aktivitet' });
   }
 };
+
+// Hent brukere som har tilgang til en gitt lås
+exports.getUsersForLock = async (req, res) => {
+  const lockId = req.params.id;
+  const requester = req.user;
+
+  if (!lockId || isNaN(lockId)) {
+    return res.status(400).json({ error: 'Ugyldig lockId' });
+  }
+
+  try {
+    // Kun admin eller eier av låsen kan hente listen
+    if (requester.role !== 'admin') {
+      const [ownerCheck] = await db.query(
+        'SELECT owner_id FROM locks WHERE id = ?',
+        [lockId]
+      );
+
+      if (!ownerCheck || ownerCheck.length === 0) {
+        return res.status(404).json({ error: 'Lås ikke funnet' });
+      }
+
+      if (Number(ownerCheck[0].owner_id) !== requester.id) {
+        return res.status(403).json({ error: 'Ingen tilgang til denne låsen' });
+      }
+    }
+
+    const query = `
+      SELECT u.id, u.email, 'eier' AS role
+      FROM locks l
+      JOIN users u ON l.owner_id = u.id
+      WHERE l.id = ?
+      UNION ALL
+      SELECT u.id, u.email, ul.role
+      FROM user_locks ul
+      JOIN users u ON ul.user_id = u.id
+      WHERE ul.lock_id = ?
+      UNION ALL
+      SELECT u.id, u.email, agu.role
+      FROM access_group_users agu
+      JOIN access_group_locks agl ON agl.group_id = agu.group_id
+      JOIN users u ON agu.user_id = u.id
+      WHERE agl.lock_id = ?
+    `;
+
+    let [rows] = await db.query(query, [lockId, lockId, lockId]);
+    if (!Array.isArray(rows)) rows = rows || [];
+
+    const priority = { eier: 3, admin: 2, bruker: 1, user: 1 };
+    const users = {};
+    for (const row of rows) {
+      const existing = users[row.id];
+      if (!existing || (priority[row.role] || 0) > (priority[existing.role] || 0)) {
+        users[row.id] = { id: row.id, email: row.email, role: row.role };
+      }
+    }
+
+    res.json(Object.values(users));
+  } catch (err) {
+    console.error('🔥 Feil i getUsersForLock:', err);
+    res.status(500).json({ error: 'Kunne ikke hente brukere for lås' });
+  }
+};

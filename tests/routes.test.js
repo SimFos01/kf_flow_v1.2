@@ -64,3 +64,17 @@ test('lockRoutes exposes POST /:id/lock', () => {
     assert.ok(handlers.includes(lockController.lockLock));
   });
 });
+
+test('lockRoutes exposes GET /:id/users', () => {
+  withStubs({
+    '../adapters/raspberryAdapter': {},
+    '../adapters/aviorAdapter': {}
+  }, () => {
+    const lockRoutes = require('../routes/lockRoutes');
+    const lockController = require('../controllers/lockController');
+    const layer = findRoute(lockRoutes, '/:id/users', 'get');
+    assert.ok(layer);
+    const handlers = layer.route.stack.map(s => s.handle);
+    assert.ok(handlers.includes(lockController.getUsersForLock));
+  });
+});
