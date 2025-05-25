@@ -32,6 +32,15 @@ const lockController = require('../controllers/lockController');
  *     responses:
  *       200:
  *         description: Låsen ble opprettet
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 id:
+ *                   type: integer
  *       400:
  *         description: Ugyldig input
  *       500:
@@ -51,6 +60,47 @@ router.post('/', verifyToken, lockController.createLock);
  *     responses:
  *       200:
  *         description: Liste over låser
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user_id:
+ *                   type: integer
+ *                 locks:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                       name:
+ *                         type: string
+ *                       type:
+ *                         type: string
+ *                       eier:
+ *                         type: string
+ *                       floor:
+ *                         type: string
+ *                       room:
+ *                         type: string
+ *                       adress:
+ *                         type: string
+ *                       adapter_data:
+ *                         type: object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   name:
+ *                     type: string
+ *                   status:
+ *                     type: string
  *       500:
  *         description: Feil ved henting av låser
  */
@@ -76,6 +126,15 @@ router.get('/', verifyToken, lockController.getAccessibleLocks);
  *     responses:
  *       200:
  *         description: Statusinformasjon
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 status:
+ *                   type: string
  *       403:
  *         description: Ingen tilgang
  *       500:
@@ -101,6 +160,15 @@ router.get('/:id/status', verifyToken, lockController.lockStatus);
  *     responses:
  *       200:
  *         description: Låsen åpnet
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 result:
+ *                   type: string
  *       403:
  *         description: Ingen tilgang
  *       500:
@@ -127,6 +195,15 @@ router.post('/:id/open', verifyToken, lockController.openLock);
  *     responses:
  *       200:
  *         description: Låsen låst
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 result:
+ *                   type: string
  *       403:
  *         description: Ingen tilgang
  *       500:
@@ -154,6 +231,29 @@ router.post('/:id/lock', verifyToken, lockController.lockLock);
  *     responses:
  *       200:
  *         description: Låser til bruker
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   name:
+ *                     type: string
+ *                   type:
+ *                     type: string
+ *                   eier:
+ *                     type: string
+ *                   floor:
+ *                     type: string
+ *                   room:
+ *                     type: string
+ *                   adress:
+ *                     type: string
+ *                   adapter_data:
+ *                     type: object
  */
 router.post('/accessible', verifyToken, lockController.getLockList);
 /**
@@ -178,6 +278,29 @@ router.post('/accessible', verifyToken, lockController.getLockList);
  *     responses:
  *       200:
  *         description: Låsdetaljer
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 name:
+ *                   type: string
+ *                 type:
+ *                   type: string
+ *                 eier:
+ *                   type: string
+ *                 floor:
+ *                   type: string
+ *                 room:
+ *                   type: string
+ *                 adress:
+ *                   type: string
+ *                 adapter_data:
+ *                   type: object
+ *                 status:
+ *                   type: string
  *       404:
  *         description: Ikke funnet
  *       500:
@@ -226,6 +349,19 @@ router.post('/all_accessible', verifyToken, lockController.getAllAccessibleLocks
  *     responses:
  *       200:
  *         description: Liste over brukere med tilgang
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   email:
+ *                     type: string
+ *                   role:
+ *                     type: string
  *       403:
  *         description: Ingen tilgang
  *       500:

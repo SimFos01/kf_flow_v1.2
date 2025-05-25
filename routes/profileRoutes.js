@@ -16,6 +16,28 @@ const { verifyToken } = require('../middleware/authMiddleware');
  *     responses:
  *       200:
  *         description: Brukerprofil
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     first_name:
+ *                       type: string
+ *                     last_name:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     phone_number:
+ *                       type: string
+ *                     role:
+ *                       type: string
+ *                     created_at:
+ *                       type: string
  *       404:
  *         description: Bruker ikke funnet
  *       500:

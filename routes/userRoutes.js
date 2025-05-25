@@ -24,6 +24,13 @@ const userlocksController = require('../controllers/userlocksController')
  *     responses:
  *       200:
  *         description: Returnerer en JWT-token ved suksess
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
  *       401:
  *         description: Ugyldig e-post eller passord
  */
@@ -47,6 +54,19 @@ router.post('/login', userController.loginUser);
  *     responses:
  *       200:
  *         description: Liste over brukere
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   email:
+ *                     type: string
+ *                   role:
+ *                     type: string
+ *                   lock_count:
+ *                     type: integer
  *       400:
  *         description: Mangler nødvendig data
  */
