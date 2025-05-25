@@ -9,12 +9,13 @@ exports.open = async (adapterData) => {
   if (!device || !password || !out) throw new Error('adapterData mangler device, password eller out');
 
   const url = mobikeyUrl('J', device, password);
+  const safeUrl = mobikeyUrl('J', device, '***');
   const command = `OUT${out}=1`;
   try {
     const res = await axios.post(url, command, {
       headers: { 'Content-Type': 'text/plain' }
     });
-    console.log(`[MOBIKEY] OPEN: ${url} →`, res.data);
+    console.log(`[MOBIKEY] OPEN: ${safeUrl} →`, res.data);
     return res.data;
   } catch (err) {
     console.error('[MOBIKEY] Feil ved OPEN:', err.message);
@@ -27,12 +28,13 @@ exports.lock = async (adapterData) => {
   if (!device || !password || !out) throw new Error('adapterData mangler device, password eller out');
 
   const url = mobikeyUrl('J', device, password);
+  const safeUrl = mobikeyUrl('J', device, '***');
   const command = `OUT${out}=0`;
   try {
     const res = await axios.post(url, command, {
       headers: { 'Content-Type': 'text/plain' }
     });
-    console.log(`[MOBIKEY] LOCK: ${url} →`, res.data);
+    console.log(`[MOBIKEY] LOCK: ${safeUrl} →`, res.data);
     return res.data;
   } catch (err) {
     console.error('[MOBIKEY] Feil ved LOCK:', err.message);

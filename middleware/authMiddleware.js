@@ -1,9 +1,10 @@
 const jwt = require('jsonwebtoken');
+const logger = require('../utils/logger');
 
 function verifyToken(req, res, next) {
-  console.log('[DEBUG] Header:', req.headers.authorization);
-  console.log('[DEBUG] Body:', req.body);
-  console.log('[DEBUG] Query:', req.query);
+  logger.debug('[DEBUG] Header:', req.headers.authorization);
+  logger.debug('[DEBUG] Body:', req.body);
+  logger.debug('[DEBUG] Query:', req.query);
 
   let token = null;
 
