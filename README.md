@@ -1,1 +1,55 @@
-"# kf_flow" 
+# kf_flow
+
+Dette er en Node.js-basert server for prototyping av adgangssystemet *Keyfree Flow*.
+
+## Installasjon
+
+1. Sørg for at du har **Node.js** installert (>= 14).
+2. Klon dette repositoriet og installer avhengigheter:
+   ```bash
+   git clone <repo-url>
+   cd kf_flow_v1.2
+   npm install
+   ```
+3. Opprett en `.env`-fil i rotkatalogen og definer nødvendige miljøvariabler (se nedenfor).
+4. Start serveren:
+   ```bash
+   node app.js
+   ```
+   Serveren lytter som standard på `http://localhost:3000`.
+
+## Miljøvariabler
+
+| Navn       | Beskrivelse                  |
+|------------|------------------------------|
+| `DB_HOST`  | Adresse til MariaDB-serveren |
+| `DB_USER`  | Databasebruker               |
+| `DB_PASS`  | Passord for databasebruker   |
+| `DB_NAME`  | Databasenavn                 |
+| `JWT_SECRET` | Hemmelig nøkkel brukt for å signere JWT-token |
+
+Alle variablene må settes i `.env`-filen før du starter applikasjonen.
+
+## Brukseksempler
+
+Registrer en ny bruker:
+```bash
+curl -X POST http://localhost:3000/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"hemmelig"}'
+```
+
+Logg inn og hent JWT-token:
+```bash
+curl -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"hemmelig"}'
+```
+
+Kall en beskyttet rute (erstatt `<TOKEN>` med token fra forrige steg):
+```bash
+curl -H "Authorization: Bearer <TOKEN>" http://localhost:3000/me
+```
+
+Swagger-dokumentasjon er tilgjengelig på `http://localhost:3000/api-docs` etter at serveren er startet.
+
