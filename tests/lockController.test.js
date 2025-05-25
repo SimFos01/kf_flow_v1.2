@@ -62,3 +62,27 @@ test('lockLock denies access when hasAccessToLock is false', async () => {
     assert.deepStrictEqual(res.body, { error: 'Ingen tilgang til denne låsen' });
   });
 });
+
+test('getUsersForLock returns deduplicated users', async () => {
+  await withStubs({
+    '../config/db': { query: async () => [[
+      { id: 1, email: 'owner@example.com', role: 'eier' },
+      { id: 2, email: 'admin@example.com', role: 'admin' },
+      { id: 2, email: 'admin@example.com', role: 'bruker' },
+      { id: 3, email: 'user@example.com', role: 'bruker' }
+    ]] },
+    '../adapters/raspberryAdapter': {},
+    '../adapters/aviorAdapter': {}
+  }, async () => {
+    const { getUsersForLock } = require('../controllers/lockController');
+    const req = { params: { id: 5 }, user: { id: 99, role: 'admin' } };
+    const res = createRes();
+    await getUsersForLock(req, res);
+    assert.strictEqual(res.statusCode, undefined);
+    assert.deepStrictEqual(res.body, [
+      { id: 1, email: 'owner@example.com', role: 'eier' },
+      { id: 2, email: 'admin@example.com', role: 'admin' },
+      { id: 3, email: 'user@example.com', role: 'bruker' }
+    ]);
+  });
+});

@@ -207,5 +207,31 @@ router.post('/getbyid', verifyToken, lockController.getLockById);
  */
 router.post('/all_accessible', verifyToken, lockController.getAllAccessibleLocks);
 
+/**
+ * @swagger
+ * /lock/{id}/users:
+ *   get:
+ *     summary: Hent brukere som har tilgang til en lås
+ *     tags:
+ *       - Lås
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Lås-ID
+ *     responses:
+ *       200:
+ *         description: Liste over brukere med tilgang
+ *       403:
+ *         description: Ingen tilgang
+ *       500:
+ *         description: Serverfeil
+ */
+router.get('/:id/users', verifyToken, lockController.getUsersForLock);
+
 
 module.exports = router;
