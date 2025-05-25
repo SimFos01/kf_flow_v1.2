@@ -9,7 +9,6 @@ DB_NAME=kf_flow
 JWT_SECRET=your_jwt_secret
 PI_API_KEY=my_pi_internal_key
 ```
-=======
 
 Dette er en Node.js-basert server for prototyping av adgangssystemet *Keyfree Flow*.
 
@@ -64,7 +63,6 @@ curl -H "Authorization: Bearer <TOKEN>" http://localhost:3000/me
 
 Swagger-dokumentasjon er tilgjengelig på `http://localhost:3000/api-docs` etter at serveren er startet.
 
-=======
 Denne applikasjonen bruker Node.js. Prosjektet inkluderer enkle enhetstester som kan kjøres med Node sitt innebygde test-rammeverk.
 
 ## Kjøre tester
