@@ -28,6 +28,23 @@ logger.debug('requireAdmin:', typeof requireAdmin);
  *     responses:
  *       200:
  *         description: Liste over tilgangsgrupper
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   name:
+ *                     type: string
+ *                   role:
+ *                     type: string
+ *                   user_count:
+ *                     type: integer
+ *                   lock_count:
+ *                     type: integer
  *       401:
  *         description: Ugyldig eller manglende token
  *       500:
@@ -56,6 +73,19 @@ router.post('/list', verifyToken, accessGroupController.getAccessGroupsForUser);
  *     responses:
  *       200:
  *         description: Liste over brukere i gruppen
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   email:
+ *                     type: string
+ *                   role:
+ *                     type: string
  *       401:
  *         description: Ugyldig eller manglende token
  *       403:
