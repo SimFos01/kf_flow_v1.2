@@ -13,6 +13,7 @@ const morgan = require('morgan');
 const path = require('path');
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
+const { verifyToken } = require('./middleware/authMiddleware');
 expressOasGenerator.init(app, {
   writeIntervalMs: 2000,
   specOutputPath: path.join(__dirname, 'oas-doc.json'),
@@ -55,20 +56,6 @@ const db = mysql.createPool({
   password: process.env.DB_PASS,
   database: process.env.DB_NAME
 });
-
-// Middleware: verifiser JWT-token
-function verifyToken(req, res, next) {
-  const token = req.headers['authorization']?.split(' ')[1];
-  if (!token) return res.status(403).send('Token mangler');
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch {
-    res.status(401).send('Token ugyldig');
-  }
-}
 
 // Registrering av bruker
 app.post('/auth/register', async (req, res) => {
