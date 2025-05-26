@@ -88,23 +88,11 @@ router.post('/', verifyToken, lockController.createLock);
  *                         type: string
  *                       adapter_data:
  *                         type: object
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                   name:
- *                     type: string
- *                   status:
- *                     type: string
+ *                       status:
+ *                         type: string
  *       500:
  *         description: Feil ved henting av låser
  */
-
 router.get('/', verifyToken, lockController.getAccessibleLocks);
 
 /**
