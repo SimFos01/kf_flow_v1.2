@@ -13,7 +13,10 @@ exports.createGroup = async (req, res) => {
       'INSERT INTO access_groups (name) VALUES (?)',
       [name]
     );
-    res.json({ success: true, groupId: result.insertId });
+    // MariaDB can return insertId as a BigInt, which JSON.stringify cannot
+    // handle. Convert the value to a regular Number before sending the
+    // response to avoid `TypeError: Do not know how to serialize a BigInt`.
+    res.json({ success: true, groupId: Number(result.insertId) });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Kunne ikke opprette gruppe' });
@@ -140,6 +143,16 @@ exports.getAccessGroupsForUser = async (req, res) => {
     `;
     let rows = await db.query(query, [userId]);
     rows = Array.isArray(rows) && Array.isArray(rows[0]) ? rows[0] : rows;
+    if (Array.isArray(rows)) {
+      rows = rows.map(row => {
+        for (const key of Object.keys(row)) {
+          if (typeof row[key] === 'bigint') {
+            row[key] = Number(row[key]);
+          }
+        }
+        return row;
+      });
+    }
     res.json(Array.isArray(rows) ? rows : []);
   } catch (err) {
     console.error('🔥 Feil i getAccessGroupsForUser:', err);
