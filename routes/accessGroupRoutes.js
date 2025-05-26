@@ -51,6 +51,15 @@ logger.debug('requireAdmin:', typeof requireAdmin);
  *         description: Serverfeil
  */
 router.post('/list', verifyToken, accessGroupController.getAccessGroupsForUser);
+
+// Opprett ny tilgangsgruppe
+router.post('/create', verifyToken, accessGroupController.createGroup);
+
+// Legg til bruker i gruppe
+router.post('/add-user', verifyToken, accessGroupController.addUserToGroup);
+
+// Legg til lås i gruppe
+router.post('/add-lock', verifyToken, accessGroupController.addLockToGroup);
 /**
  * @swagger
  * /accessgroup/users:

@@ -60,9 +60,9 @@ exports.getSharedUsers = async (req, res) => {
       WHERE l.owner_id = ?
       GROUP BY u.email, ul.role
     `;
-    let [rows] = await db.query(query, [userId]);
-    if (!Array.isArray(rows)) rows = rows[0] || [];
-    res.json(rows);
+    let rows = await db.query(query, [userId]);
+    rows = Array.isArray(rows) && Array.isArray(rows[0]) ? rows[0] : rows;
+    res.json(Array.isArray(rows) ? rows : []);
   } catch (err) {
     console.error('🔥 Feil i getSharedUsers:', err);
     res.status(500).json({ error: 'Kunne ikke hente delte brukere' });

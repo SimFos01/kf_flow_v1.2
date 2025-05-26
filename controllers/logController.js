@@ -2,14 +2,15 @@ const db = require('../config/db');
 
 exports.getAllLogs = async (req, res) => {
   try {
-    const [rows] = await db.query(
+    let rows = await db.query(
       `SELECT al.*, u.username, l.name AS lock_name
        FROM access_logs al
        JOIN users u ON u.id = al.user_id
        JOIN locks l ON l.id = al.lock_id
        ORDER BY al.timestamp DESC`
     );
-    res.json(rows);
+    rows = Array.isArray(rows) && Array.isArray(rows[0]) ? rows[0] : rows;
+    res.json(Array.isArray(rows) ? rows : []);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Kunne ikke hente logg' });
@@ -30,19 +31,19 @@ exports.getLogsByLock = async (req, res) => {
     // 🔐 Kun admin eller eier får hente logg
 
     if (userRole !== 'admin') {
-      const [check] = await db.query(
+      const check = await db.query(
         'SELECT 1 FROM locks WHERE id = ? AND owner_id = ?',
         [lockId, userId]
       );
 
-      if (check.length === 0) {
+      if (!check || check.length === 0) {
         return res.status(403).json({ error: 'Ingen tilgang til denne låsen' });
       }
     }
 
     // ✅ Hent logger – med norskformatert timestamp
-    const result = await db.query(
-      `SELECT 
+    let result = await db.query(
+      `SELECT
   al.id, al.user_id, al.lock_id, al.action, al.result, al.timestamp, al.success,
   DATE_FORMAT(al.timestamp, '%d.%m.%Y') AS formatted_date,
   DATE_FORMAT(al.timestamp, '%H:%i') AS formatted_time,
@@ -54,7 +55,8 @@ ORDER BY al.timestamp DESC`,
       [lockId]
     );
 
-    const logs = Array.isArray(result[0]) ? result[0] : result;
+    result = Array.isArray(result) && Array.isArray(result[0]) ? result[0] : result;
+    const logs = Array.isArray(result) ? result : [];
     res.json(logs);
   } catch (err) {
     console.error('🔥 Feil i getLogsByLock:', err);
@@ -72,17 +74,17 @@ exports.getLastActivityForLock = async (req, res) => {
 
   try {
     if (user.role !== 'admin') {
-      const [check] = await db.query(
+      const check = await db.query(
         'SELECT 1 FROM locks WHERE id = ? AND owner_id = ?',
         [lockId, user.id]
       );
 
-      if (check.length === 0) {
+      if (!check || check.length === 0) {
         return res.status(403).json({ error: 'Ingen tilgang til denne låsen' });
       }
     }
 
-    const result = await db.query(
+    let result = await db.query(
       `SELECT al.action AS last_action,
               al.timestamp,
               DATE_FORMAT(al.timestamp, '%d.%m.%Y') AS formatted_date,
@@ -96,7 +98,8 @@ exports.getLastActivityForLock = async (req, res) => {
       [lockId]
     );
 
-    const rows = Array.isArray(result[0]) ? result[0] : result;
+    result = Array.isArray(result) && Array.isArray(result[0]) ? result[0] : result;
+    const rows = Array.isArray(result) ? result : [];
 
     if (!rows || rows.length === 0) {
       return res.status(404).json({ error: 'Ingen logger funnet for denne låsen' });
