@@ -8,7 +8,8 @@ const db = require('../config/db');
 exports.createGroup = async (req, res) => {
   const { name } = req.body;
   try {
-    const [result] = await db.query(
+    // mariadb returnerer et enkelt resultatobjekt for INSERT
+    const result = await db.query(
       'INSERT INTO access_groups (name) VALUES (?)',
       [name]
     );
@@ -50,13 +51,14 @@ exports.addLockToGroup = async (req, res) => {
 exports.getGroupMembers = async (req, res) => {
   const { groupId } = req.params;
   try {
-    const [rows] = await db.query(
+    let rows = await db.query(
       `SELECT u.id, u.username, u.role FROM users u
        JOIN group_members gm ON gm.user_id = u.id
        WHERE gm.group_id = ?`,
       [groupId]
     );
-    res.json(rows);
+    rows = Array.isArray(rows) && Array.isArray(rows[0]) ? rows[0] : rows;
+    res.json(Array.isArray(rows) ? rows : []);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Kunne ikke hente medlemmer' });
@@ -66,13 +68,14 @@ exports.getGroupMembers = async (req, res) => {
 exports.getGroupLocks = async (req, res) => {
   const { groupId } = req.params;
   try {
-    const [rows] = await db.query(
+    let rows = await db.query(
       `SELECT l.id, l.name, l.type FROM locks l
        JOIN group_locks gl ON gl.lock_id = l.id
        WHERE gl.group_id = ?`,
       [groupId]
     );
-    res.json(rows);
+    rows = Array.isArray(rows) && Array.isArray(rows[0]) ? rows[0] : rows;
+    res.json(Array.isArray(rows) ? rows : []);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Kunne ikke hente låser i gruppe' });
@@ -95,10 +98,11 @@ exports.getUsersInAccessGroup = async (req, res) => {
   // Sjekk at denne brukeren er admin eller eier i gruppa
   try {
     // Finn rollen til brukeren i denne gruppa
-    const [roleRows] = await db.query(
+    let roleRows = await db.query(
       `SELECT role FROM access_group_users WHERE group_id = ? AND user_id = ?`,
       [group_id, userId]
     );
+    roleRows = Array.isArray(roleRows) && Array.isArray(roleRows[0]) ? roleRows[0] : roleRows;
     const userRole = Array.isArray(roleRows) && roleRows[0] ? roleRows[0].role : null;
 
     if (userRole !== 'admin' && userRole !== 'eier') {
@@ -106,14 +110,15 @@ exports.getUsersInAccessGroup = async (req, res) => {
     }
 
     // Hent alle brukere i gruppen
-    const [rows] = await db.query(
+    let rows = await db.query(
       `SELECT u.id, u.email, agu.role
        FROM access_group_users agu
        JOIN users u ON agu.user_id = u.id
        WHERE agu.group_id = ?`,
       [group_id]
     );
-    res.json(rows);
+    rows = Array.isArray(rows) && Array.isArray(rows[0]) ? rows[0] : rows;
+    res.json(Array.isArray(rows) ? rows : []);
   } catch (err) {
     console.error('🔥 Feil i getUsersInAccessGroup:', err);
     res.status(500).json({ error: 'Kunne ikke hente brukere i gruppa' });
@@ -133,9 +138,9 @@ exports.getAccessGroupsForUser = async (req, res) => {
       JOIN access_group_users agu ON agu.group_id = ag.id
       WHERE agu.user_id = ?
     `;
-    let [rows] = await db.query(query, [userId]);
-    if (!Array.isArray(rows)) rows = rows[0] || [];
-    res.json(rows);
+    let rows = await db.query(query, [userId]);
+    rows = Array.isArray(rows) && Array.isArray(rows[0]) ? rows[0] : rows;
+    res.json(Array.isArray(rows) ? rows : []);
   } catch (err) {
     console.error('🔥 Feil i getAccessGroupsForUser:', err);
     res.status(500).json({ error: 'Kunne ikke hente tilgangsgrupper' });

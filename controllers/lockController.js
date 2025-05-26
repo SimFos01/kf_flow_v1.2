@@ -99,7 +99,8 @@ exports.getAllAccessibleLocks = async (req, res) => {
       WHERE agu.user_id = ? OR ul.user_id = ? OR l.owner_id = ?
     `;
     let rows = await db.query(query, [userId, userId, userId]);
-    if (!Array.isArray(rows)) rows = rows[0] || [];
+    rows = Array.isArray(rows) && Array.isArray(rows[0]) ? rows[0] : rows;
+    if (!Array.isArray(rows)) rows = [];
 
     const locks = (rows || []).map((lock) => {
       let adapterData = lock.adapter_data;
@@ -204,16 +205,15 @@ exports.getLockById = async (req, res) => {
 
 exports.getAccessibleLocks = async (req, res) => {
     try {
-        let [rows] = await db.query(
+        let rows = await db.query(
             `SELECT * FROM locks WHERE owner_id = ?`,
             [req.user.id]
           );
           logger.debug('[BODY keys]', Object.keys(req.body || {}));
-          if (!Array.isArray(rows)) {
-            rows = [rows]; // Tving inn i array om det er et enkelt objekt
-          }
-          
-          const locks = JSON.parse(JSON.stringify(rows)); // Sikrer ren array
+          rows = Array.isArray(rows) && Array.isArray(rows[0]) ? rows[0] : rows;
+          const list = Array.isArray(rows) ? rows : [];
+
+          const locks = JSON.parse(JSON.stringify(list)); // Sikrer ren array
 
             logger.debug('🔎 Hentet locks:', Array.isArray(locks), locks.length);
       const locksWithStatus = await Promise.all(
@@ -300,7 +300,8 @@ exports.openLock = async (req, res) => {
     }
 
     // 🔍 Hent lås fra DB (robust for array/objekt)
-    const [rows] = await db.query(`SELECT * FROM locks WHERE id = ?`, [id]);
+    let rows = await db.query(`SELECT * FROM locks WHERE id = ?`, [id]);
+    rows = Array.isArray(rows) && Array.isArray(rows[0]) ? rows[0] : rows;
     let lock;
     if (Array.isArray(rows)) {
       if (rows.length === 0) {
@@ -391,7 +392,8 @@ exports.lockLock = async (req, res) => {
     }
 
     // 🔍 Hent lås fra DB (robust for array/objekt)
-    const [rows] = await db.query(`SELECT * FROM locks WHERE id = ?`, [id]);
+    let rows = await db.query(`SELECT * FROM locks WHERE id = ?`, [id]);
+    rows = Array.isArray(rows) && Array.isArray(rows[0]) ? rows[0] : rows;
     let lock;
     if (Array.isArray(rows)) {
       if (rows.length === 0) {
@@ -481,13 +483,14 @@ exports.lockStatus = async (req, res) => {
       return res.status(403).json({ error: 'Ingen tilgang til denne låsen' });
     }
 
-    const lockRows = await db.query(`SELECT * FROM locks WHERE id = ?`, [id]);
-    if (lockRows.length === 0) {
+    let lockRows = await db.query(`SELECT * FROM locks WHERE id = ?`, [id]);
+    lockRows = Array.isArray(lockRows) && Array.isArray(lockRows[0]) ? lockRows[0] : lockRows;
+    if (!lockRows || lockRows.length === 0) {
       await logAccess(userId, id, 'status', false);
       return res.status(404).json({ error: 'Lås ikke funnet' });
     }
 
-    const lock = lockRows[0];
+    const lock = Array.isArray(lockRows) ? lockRows[0] : lockRows;
     const adapterData = typeof lock.adapter_data === 'string' 
     ? JSON.parse(lock.adapter_data) 
     : lock.adapter_data;
@@ -526,19 +529,19 @@ exports.getLastActivityForLock = async (req, res) => {
   try {
     // 🔐 Admin eller eier-sjekk
     if (user.role !== 'admin') {
-      const [check] = await db.query(
+      const check = await db.query(
         'SELECT 1 FROM locks WHERE id = ? AND owner_id = ?',
         [lockId, user.id]
       );
 
-      if (check.length === 0) {
+      if (!check || check.length === 0) {
         return res.status(403).json({ error: 'Ingen tilgang til denne låsen' });
       }
     }
 
     // 📦 Hent siste logg
-    const [rows] = await db.query(
-      `SELECT al.action AS last_action,
+      const rows = await db.query(
+        `SELECT al.action AS last_action,
               al.timestamp,
               DATE_FORMAT(al.timestamp, '%d.%m.%Y') AS formatted_date,
               DATE_FORMAT(al.timestamp, '%H:%i') AS formatted_time,
@@ -551,7 +554,7 @@ exports.getLastActivityForLock = async (req, res) => {
       [lockId]
     );
 
-    if (rows.length === 0) {
+      if (!rows || rows.length === 0) {
       return res.status(404).json({ error: 'Ingen logger funnet for denne låsen' });
     }
 
@@ -574,7 +577,7 @@ exports.getUsersForLock = async (req, res) => {
   try {
     // Kun admin eller eier av låsen kan hente listen
     if (requester.role !== 'admin') {
-      const [ownerCheck] = await db.query(
+      const ownerCheck = await db.query(
         'SELECT owner_id FROM locks WHERE id = ?',
         [lockId]
       );
@@ -606,12 +609,13 @@ exports.getUsersForLock = async (req, res) => {
       WHERE agl.lock_id = ?
     `;
 
-    let [rows] = await db.query(query, [lockId, lockId, lockId]);
-    if (!Array.isArray(rows)) rows = rows || [];
+      let rows = await db.query(query, [lockId, lockId, lockId]);
+      rows = Array.isArray(rows) && Array.isArray(rows[0]) ? rows[0] : rows;
+      const list = Array.isArray(rows) ? rows : [];
 
     const priority = { eier: 3, admin: 2, bruker: 1, user: 1 };
     const users = {};
-    for (const row of rows) {
+      for (const row of list) {
       const existing = users[row.id];
       if (!existing || (priority[row.role] || 0) > (priority[existing.role] || 0)) {
         users[row.id] = { id: row.id, email: row.email, role: row.role };
