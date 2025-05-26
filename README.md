@@ -62,6 +62,8 @@ curl -H "Authorization: Bearer <TOKEN>" http://localhost:3000/me
 ```
 
 Swagger-dokumentasjon er tilgjengelig på `http://localhost:3000/api-docs` etter at serveren er startet.
+Et enkelt web-grensesnitt ligger i `public/webui/index.html`. Start serveren og åpne `http://localhost:3000/webui/index.html` i nettleseren for å logge inn, se og opprette låser samt administrere tilgangsgrupper.
+
 
 Denne applikasjonen bruker Node.js. Prosjektet inkluderer enkle enhetstester som kan kjøres med Node sitt innebygde test-rammeverk.
 
