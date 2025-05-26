@@ -13,7 +13,10 @@ exports.createGroup = async (req, res) => {
       'INSERT INTO access_groups (name) VALUES (?)',
       [name]
     );
-    res.json({ success: true, groupId: result.insertId });
+    // MariaDB can return insertId as a BigInt, which JSON.stringify cannot
+    // handle. Convert the value to a regular Number before sending the
+    // response to avoid `TypeError: Do not know how to serialize a BigInt`.
+    res.json({ success: true, groupId: Number(result.insertId) });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Kunne ikke opprette gruppe' });
