@@ -40,6 +40,12 @@ Dette er en Node.js-basert server for prototyping av adgangssystemet *Keyfree Fl
 
 Alle variablene må settes i `.env`-filen før du starter applikasjonen.
 
+## Raspberry-adapter tidsavbrudd
+
+Forespørsler mot Raspberry-låser vil automatisk time ut etter 4 sekunder. Hvis
+låsen ikke svarer, gjør serveren ett nytt forsøk etter 3 sekunder. Dette
+hindrer at brukergrensesnittet henger dersom en lås er utilgjengelig.
+
 ## Brukseksempler
 
 Registrer en ny bruker:

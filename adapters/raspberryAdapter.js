@@ -1,6 +1,28 @@
 const axios = require('axios');
 const logger = require('../utils/logger');
 
+const TIMEOUT = 4000; // ms
+const RETRY_DELAY = 3000; // ms
+const MAX_RETRIES = 1;
+
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function requestWithRetry(config) {
+  let attempts = 0;
+  while (true) {
+    try {
+      return await axios({ timeout: TIMEOUT, ...config });
+    } catch (err) {
+      if (!err.response && attempts < MAX_RETRIES) {
+        attempts++;
+        await delay(RETRY_DELAY);
+        continue;
+      }
+      throw err;
+    }
+  }
+}
+
 const INTERNAL_API_KEY = process.env.PI_API_KEY;
 
 if (!INTERNAL_API_KEY) {
@@ -14,7 +36,10 @@ exports.unlock = async (adapterData) => {
   }
 
   try {
-    const res = await axios.post(`http://${ip}/open`, { pin }, {
+    const res = await requestWithRetry({
+      method: 'post',
+      url: `http://${ip}/open`,
+      data: { pin },
       headers: { 'x-api-key': INTERNAL_API_KEY }
     });
     logger.debug(`🔓 [UNLOCK] Respons fra Pi ${ip}:`, {
@@ -42,7 +67,10 @@ exports.lock = async (adapterData) => {
   }
 
   try {
-    const res = await axios.post(`http://${ip}/lock`, { pin }, {
+    const res = await requestWithRetry({
+      method: 'post',
+      url: `http://${ip}/lock`,
+      data: { pin },
       headers: { 'x-api-key': INTERNAL_API_KEY }
     });
     logger.debug(`🔒 [LOCK] Respons fra Pi ${ip}:`, {
@@ -70,7 +98,9 @@ exports.status = async (adapterData) => {
   }
 
   try {
-    const res = await axios.get(`http://${ip}/status`, {
+    const res = await requestWithRetry({
+      method: 'get',
+      url: `http://${ip}/status`,
       params: { pin },
       headers: { 'x-api-key': INTERNAL_API_KEY }
     });
