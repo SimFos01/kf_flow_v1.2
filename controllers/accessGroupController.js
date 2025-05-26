@@ -143,6 +143,16 @@ exports.getAccessGroupsForUser = async (req, res) => {
     `;
     let rows = await db.query(query, [userId]);
     rows = Array.isArray(rows) && Array.isArray(rows[0]) ? rows[0] : rows;
+    if (Array.isArray(rows)) {
+      rows = rows.map(row => {
+        for (const key of Object.keys(row)) {
+          if (typeof row[key] === 'bigint') {
+            row[key] = Number(row[key]);
+          }
+        }
+        return row;
+      });
+    }
     res.json(Array.isArray(rows) ? rows : []);
   } catch (err) {
     console.error('🔥 Feil i getAccessGroupsForUser:', err);
